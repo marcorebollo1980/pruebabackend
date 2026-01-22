@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.redsocial</groupId>
-	<artifactId>redsocial</artifactId>
+	<artifactId>post-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>redsocial</name>
-	<description>Red Social Monolithic Application</description>
+	<name>post-service</name>
+	<description>Post Service for Red Social</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
