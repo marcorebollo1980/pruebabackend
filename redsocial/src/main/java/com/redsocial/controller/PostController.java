@@ -46,6 +46,10 @@ public class PostController {
 
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> likePost(@PathVariable Long id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Long userId = userService.findByUsername(username)
@@ -60,6 +64,10 @@ public class PostController {
 
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Void> unlikePost(@PathVariable Long id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Long userId = userService.findByUsername(username)

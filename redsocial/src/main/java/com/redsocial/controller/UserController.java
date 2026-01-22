@@ -22,7 +22,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}/profile")
-    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable Long id) {
+    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable(required = false) Long id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
