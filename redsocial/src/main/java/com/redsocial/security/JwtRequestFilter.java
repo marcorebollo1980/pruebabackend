@@ -14,6 +14,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro JWT que intercepta cada request y valida el token.
+ * Ahora extrae el userId del token y lo inyecta en CustomUserDetails.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -43,8 +47,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
+                // Crea CustomUserDetails con el userId del token
+                CustomUserDetails customUserDetails;
+                if (userDetails instanceof CustomUserDetails) {
+                    customUserDetails = (CustomUserDetails) userDetails;
+                } else {
+                    // Fallback: extrae userId del token si no es CustomUserDetails
+                    Long userId = jwtUtil.extractUserId(jwt);
+                    customUserDetails = new CustomUserDetails(
+                        userDetails.getUsername(),
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities(),
+                        userId
+                    );
+                }
+
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

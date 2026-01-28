@@ -27,8 +27,18 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
+    /**
+     * Genera un token JWT con el userId incluido como claim.
+     * Esto evita tener que consultar la BD en cada request.
+     */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        
+        // Si es CustomUserDetails, agrega el userId al token
+        if (userDetails instanceof CustomUserDetails) {
+            claims.put("userId", ((CustomUserDetails) userDetails).getUserId());
+        }
+        
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -49,6 +59,24 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    /**
+     * Extrae el userId del token JWT.
+     * @param token Token JWT
+     * @return ID del usuario, o null si no existe en el token
+     */
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object userId = claims.get("userId");
+        
+        if (userId instanceof Integer) {
+            return ((Integer) userId).longValue();
+        } else if (userId instanceof Long) {
+            return (Long) userId;
+        }
+        
+        return null;
     }
 
     public Date extractExpiration(String token) {
